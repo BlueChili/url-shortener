@@ -1,3 +1,5 @@
+import Layout from "./Layout";
+
 const Form = () => {
   return (
     <form action="/" method="POST" className="w-full max-w-4xl">

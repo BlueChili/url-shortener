@@ -1,6 +1,4 @@
-import { PropsWithChildren } from "@elysiajs/html";
-
-const Layout = (props: PropsWithChildren) => {
+const Layout = (props) => {
   return (
     <html lang="en">
       <head>
