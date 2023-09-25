@@ -16,9 +16,12 @@ const insert = db.prepare(
   "INSERT INTO urls (url, code, hits) VALUES (?, ?, 0)"
 );
 const addHit = db.prepare("UPDATE urls SET hits = hits + 1 WHERE code = ?");
+const deleteByCode = db.prepare("DELETE FROM urls WHERE code = ?");
 
 const queryArchive = db.prepare("SELECT * from urls");
 
+const BASEURL = process.env.BASEURL || 'http://localhost:3000';
+const domainRegex = new RegExp(`^https:\/\/(www\.)?${process.env.MAIN_DOMAIN}`, "i");
 const app = fastify();
 app.register(require("@fastify/view"), {
   engine: {
@@ -34,7 +37,7 @@ app.get("/", (request, reply) => {
 
 app.get("/archive", (request, reply) => {
   const archive = queryArchive.all();
-  return reply.view("src/archive", { archive });
+  return reply.view("src/archive", { archive, baseurl: process.env.BASE_URL });
 });
 
 app.post("/", (request, reply) => {
@@ -42,7 +45,7 @@ app.post("/", (request, reply) => {
     reply.code = 400;
     return "Bad Request incorrect content-type";
   }
-  if (!/^https:\/\/(www\.)?bostonfirearms.com/i.test(request.body.url)) {
+  if (!domainRegex.test(request.body.url)) {
     reply.code = 400;
     return "Bad Request incorrect domain";
   }
@@ -52,12 +55,22 @@ app.post("/", (request, reply) => {
   const urlHit = queryByUrl.get(request.body.url);
   if (codeHit === undefined && urlHit === undefined) {
     insert.run(request.body.url, code);
-    reply.view("src/success", { code });
+    reply.view("src/success", { code, baseurl: process.env.BASE_URL });
   }
 
   if (urlHit) {
-    return reply.view("/src/repeaturl", { data: urlHit });
+    return reply.view("/src/repeaturl", { data: urlHit, baseurl: process.env.BASE_URL });
   }
+});
+
+app.delete("/:code", (request, reply) => {
+  if (request.body === process.env.AUTH) {
+    reply.code = 200;
+    deleteByCode.run(request.params.code);
+    return 'ok';
+  }
+  reply.code(400);
+  return 'bad request';
 });
 
 app.get("/:code", async (request, reply) => {

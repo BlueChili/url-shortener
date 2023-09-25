@@ -32,9 +32,13 @@
             <span class="font-bold md:hidden">Code</span>
             <span class="w-20 md:text-right shrink-0">{{code}}</span>
             <span class="font-bold md:hidden">Shortened URL</span>
-            <span class="w-64 shrink-0">
-              https://bosfirearms.com/{{code}}
+            <span class="w-72 shrink-0 flex justify-between">
+              {{ ../baseurl }}/{{code}}
+              <span class="font-bold ml-2 text-red-500 delete" data-code="{{ code }}" >
+              X
+              </span>
             </span>
+
           </div>
         {{/each}}
 
@@ -43,5 +47,27 @@
         Submit
       </a>
     </div>
+    <script>
+    let code;
+    document.querySelectorAll('.delete').forEach(el => {
+      el.addEventListener('click', (event) => {
+        code = event.target.dataset.code;
+        const password = window.prompt();
+        if (typeof password === 'string') {
+          fetch(`{{ baseurl }}/${code}`, {
+            method: 'DELETE',
+            body: password,
+          })
+          .then(res => {
+            if (res.status === 200) {
+              window.alert('Successfuly deleted');
+              return location.href = '/archive';
+            } 
+            return window.alert('Something went wrong, please try again');
+          });
+        }
+      })
+    });
+    </script>
   </body>
 </html>
