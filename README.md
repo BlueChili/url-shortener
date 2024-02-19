@@ -1,15 +1,9 @@
-# Elysia with Bun runtime
+# URL shortener based in GO, and taking advantage of Vercel's serverless runtime to fill in the backend functionality
 
-## Getting Started
-To get started with this template, simply paste this command into your terminal:
-```bash
-bun create elysia ./elysia-example
+## Setup:
+
+Pass in the shortener dedicated domains and a base domain name you want the URL shortener to work with, via the environment variables:
 ```
-
-## Development
-To start the development server run:
-```bash
-bun run dev
+BASE_DOMAIN
+SHORTENER_DOMAIN
 ```
-
-Open http://localhost:3000/ with your browser to see the result.

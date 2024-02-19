@@ -1,0 +1,74 @@
+<html lang="en">
+        <head>
+                <meta charset="UTF-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <meta name="robots" content="noindex" />
+                <title>{{ .Title }}</title>
+                <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+                <script src="https://cdn.tailwindcss.com"></script>
+        </head>
+        <body>
+                <div class="flex flex-col justify-center items-center min-h-screen container px-3 mx-auto">
+                        <h1 class="pb-8 text-cyan-950 text-center font-bold text-2xl md:text-3xl">
+                                Boston firearms url shortener
+                        </h1>
+                        <div class="flex flex-col gap-6 md:gap-3">
+                                <div
+                                        class="hidden md:flex justify-end gap-6 font-bold border-b border-b-cyan-700"
+                                >
+                                        <span class="grow shrink-0">Base URL</span>
+                                        <span class="w-8 shrink-0 text-right">Hits</span>
+                                        <span class="w-20 text-right text-right">Code</span>
+                                        <span class="w-64 shrink-0">Shortened URL</span>
+                                </div>
+
+                                {{#each archive}}
+                                <div
+                                        class="flex flex-col md:flex-row justify-end gap-0.5 border border-cyan-800 md:gap-6 md:border-0 md:border-b md:border-cyan-50 p-4 rounded-lg md:p-0"
+                                >
+                                        <span class="font-bold md:hidden">URL</span>
+                                        <span class="grow 2xl:shrink-0">{{url}}</span>
+                                        <span class="font-bold md:hidden">Hits</span>
+                                        <span class="w-8 shrink-0 md:text-right">{{hits}}</span>
+                                        <span class="font-bold md:hidden">Code</span>
+                                        <span class="w-20 md:text-right shrink-0">{{code}}</span>
+                                        <span class="font-bold md:hidden">Shortened URL</span>
+                                        <span class="w-72 shrink-0 flex justify-between">
+                                                {{ ../baseurl }}/{{code}}
+                                                <span
+                                                        class="font-bold ml-2 text-red-500 cursor-pointer delete"
+                                                        data-code="{{ code }}"
+                                                >
+                                                        X
+                                                </span>
+                                        </span>
+                                </div>
+                                {{/each}}
+                        </div>
+                        <a href="/" class="font-bold pt-8 underline"> Submit </a>
+                </div>
+                <script>
+                        let code;
+                        document.querySelectorAll(".delete").forEach((el) => {
+                                el.addEventListener("click", (event) => {
+                                        code = event.target.dataset.code;
+                                        const password = window.prompt();
+                                        if (typeof password === "string") {
+                                                fetch(`{{ baseurl }}/${code}`, {
+                                                        method: "DELETE",
+                                                        body: password,
+                                                }).then((res) => {
+                                                        if (res.status === 200) {
+                                                                window.alert("Successfuly deleted");
+                                                                return (location.href = "/archive");
+                                                        }
+                                                        return window.alert(
+                                                                "Something went wrong, please try again"
+                                                        );
+                                                });
+                                        }
+                                });
+                        });
+                </script>
+        </body>
+</html>
